@@ -18,6 +18,7 @@
         <NuxtLink to="/stick" class="top-bar__link">Cane simulation</NuxtLink>
         <NuxtLink to="/game" class="top-bar__link">Blind Touch game</NuxtLink>
         <NuxtLink to="/colors" class="top-bar__link">Color vision game</NuxtLink>
+        <NuxtLink to="/cataract" class="top-bar__link">Cataract (blur + glare)</NuxtLink>
       </nav>
       <button
         type="button"
