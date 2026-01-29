@@ -1,0 +1,12 @@
+{
+  "name": "blindsite",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "preview": "nuxt preview"
+  },
+  "devDependencies": {
+    "nuxt": "^3.11.2"
+  }
+}
