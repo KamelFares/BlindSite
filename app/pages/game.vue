@@ -229,9 +229,9 @@ resetRound()
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(4, 3rem);
-  grid-template-rows: repeat(4, 3rem);
-  gap: 0.5rem;
+  grid-template-columns: repeat(4, 4.2rem);
+  grid-template-rows: repeat(4, 4.2rem);
+  gap: 0.75rem;
   justify-content: center;
   margin-bottom: 1rem;
 }
@@ -245,7 +245,7 @@ resetRound()
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 .grid__tile:hover,

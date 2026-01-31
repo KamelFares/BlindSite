@@ -26,6 +26,8 @@ declare global {
   const defineCachedEventHandler: typeof import('../../node_modules/nitropack/dist/runtime/internal/cache').defineCachedEventHandler
   const defineCachedFunction: typeof import('../../node_modules/nitropack/dist/runtime/internal/cache').defineCachedFunction
   const defineEventHandler: typeof import('../../node_modules/h3').defineEventHandler
+  const defineI18nConfig: typeof import('../../node_modules/@nuxtjs/i18n/dist/runtime/composables/shared').defineI18nConfig
+  const defineI18nLocale: typeof import('../../node_modules/@nuxtjs/i18n/dist/runtime/composables/shared').defineI18nLocale
   const defineLazyEventHandler: typeof import('../../node_modules/h3').defineLazyEventHandler
   const defineNitroErrorHandler: typeof import('../../node_modules/nitropack/dist/runtime/internal/error/utils').defineNitroErrorHandler
   const defineNitroPlugin: typeof import('../../node_modules/nitropack/dist/runtime/internal/plugin').defineNitroPlugin
@@ -147,3 +149,4 @@ export { defineTask, runTask } from 'nitropack/runtime/internal/task';
 export { defineNitroErrorHandler } from 'nitropack/runtime/internal/error/utils';
 export { buildAssetsURL as __buildAssetsURL, publicAssetsURL as __publicAssetsURL } from 'F:/BeBlind/BlindSite/node_modules/@nuxt/nitro-server/dist/runtime/utils/paths';
 export { defineAppConfig } from 'F:/BeBlind/BlindSite/node_modules/@nuxt/nitro-server/dist/runtime/utils/config';
+export { defineI18nLocale, defineI18nConfig } from 'F:/BeBlind/BlindSite/node_modules/@nuxtjs/i18n/dist/runtime/composables/shared';

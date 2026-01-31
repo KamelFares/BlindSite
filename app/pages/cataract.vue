@@ -232,9 +232,9 @@ pickNewTarget()
 }
 
 .sign {
-  border-radius: 0.9rem;
+  border-radius: 1rem;
   border: 1px solid rgba(148, 163, 184, 0.5);
-  padding: 1rem;
+  padding: 1.15rem;
   text-align: left;
   cursor: pointer;
   background: rgba(15, 23, 42, 0.65);
@@ -253,7 +253,7 @@ pickNewTarget()
   display: block;
   font-weight: 800;
   letter-spacing: 0.1em;
-  font-size: 1.15rem;
+  font-size: 1.3rem;
 }
 
 .sign__sub {
@@ -286,8 +286,8 @@ pickNewTarget()
 
 .light {
   position: absolute;
-  width: 140px;
-  height: 140px;
+  width: 170px;
+  height: 170px;
   border-radius: 999px;
   background: radial-gradient(circle, rgba(255, 255, 255, 0.75), transparent 60%);
   filter: blur(1px);

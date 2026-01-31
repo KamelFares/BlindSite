@@ -1,0 +1,85 @@
+{
+  "nav": {
+    "light": "Lichtkegel-Modus",
+    "cane": "Stock-Simulation",
+    "blindTouch": "Blind-Touch-Spiel",
+    "colorVision": "Farbsehen-Spiel",
+    "cataract": "Katarakt (Unschärfe + Blendung)",
+    "macular": "Makula (zentraler blinder Fleck)",
+    "visualSnow": "Visual Snow (neurologisch)",
+    "retinopathy": "Retinopathie (Trübungen + Flecken)",
+    "tunnel": "Tunnelblick",
+    "migraine": "Migräne-Aura",
+    "toggleLightOn": "Lichteffekt aktivieren",
+    "toggleLightOff": "Lichteffekt deaktivieren",
+    "skip": "Zum Hauptinhalt springen",
+    "language": "Sprache"
+  },
+  "home": {
+    "title": "BlindSite",
+    "subtitle1": "Scrollen Sie zum Entdecken. Der Bildschirm ist fast schwarz – bewegen Sie die Maus, um versteckten Text zu finden.",
+    "subtitle2": "Linksklick erzeugt ein Echo. Rechtsklick blendet auf. Rechtsklick gedrückt halten = Blendung bleibt an.",
+    "donateTitle": "Unterstützung für Organisationen zu Blindheit & Behinderung (Deutschland)",
+    "donateNote": "Diese Links dienen der Aufklärung und Unterstützung. Bitte prüfen Sie die Details der Organisationen vor einer Spende.",
+    "donateCta": "Spenden-Seite öffnen",
+    "donations": {
+      "dbsv": {
+        "name": "DBSV – Deutscher Blinden- und Sehbehindertenverband",
+        "desc": "Bundesverband für blinde und sehbehinderte Menschen.",
+        "url": "https://www.dbsv.org/"
+      },
+      "proretina": {
+        "name": "PRO RETINA Deutschland e. V.",
+        "desc": "Beratung und Infos zu Netzhauterkrankungen.",
+        "url": "https://www.pro-retina.de/"
+      },
+      "aktionMensch": {
+        "name": "Aktion Mensch",
+        "desc": "Fördert Inklusionsprojekte für Menschen mit Behinderung.",
+        "url": "https://www.aktion-mensch.de/"
+      },
+      "cbm": {
+        "name": "CBM Deutschland",
+        "desc": "Internationale Organisation mit Fokus auf Behinderung und Augengesundheit.",
+        "url": "https://www.cbm.de/"
+      }
+    },
+    "sections": {
+      "what": {
+        "title": "Was ist Blindheit?",
+        "text": "Blindheit bedeutet nicht immer völlige Dunkelheit. Viele blinde und sehbehinderte Menschen sehen Licht, Formen oder nur wenige Details."
+      },
+      "different": {
+        "title": "Jeder Sehverlust ist anders",
+        "text": "Es gibt nicht die eine “blinde Erfahrung”. Manche Erkrankungen betreffen das Zentrum, andere den Rand, den Kontrast oder das Farbsehen. Diese Seite ist ein Empathie‑Demo und kein medizinisches Werkzeug."
+      },
+      "navigate": {
+        "title": "Wie orientieren sich blinde Menschen?",
+        "text": "Viele nutzen einen Langstock oder Blindenführhund zusammen mit Gedächtnis, Geräuschen, Tastsinn und räumlicher Orientierung. Innen helfen Bodenstrukturen, Echos und Orientierungspunkte beim mentalen Kartenaufbau."
+      },
+      "tech": {
+        "title": "Assistive Technologie",
+        "text": "Screenreader (VoiceOver, NVDA, JAWS, TalkBack) lesen Oberflächen vor. Tastenkürzel und Gesten helfen, nach Überschriften, Links und Bedienelementen zu navigieren – ohne Maus."
+      },
+      "design": {
+        "title": "Gute Barrierefreiheit hilft allen",
+        "text": "Klare Überschriften, aussagekräftige Linktexte, Formularbeschriftungen und vollständige Tastaturbedienung bauen Barrieren ab. Probleme entstehen meist durch Designentscheidungen, nicht durch Blindheit."
+      },
+      "cataract": {
+        "title": "Katarakt-Simulation (Unschärfe + Blendung)",
+        "text": "Katarakt kann das Sehen trüben und starke Blendung verursachen. Probieren Sie das Mini‑Spiel und erhöhen Sie die Stärke.",
+        "cta": "Simulation öffnen"
+      },
+      "macular": {
+        "title": "Makula‑Degeneration Simulation",
+        "text": "Das Zentrum kann blockiert oder verschwommen sein, während die Peripherie bleibt. Testen Sie das Spiel und ändern Sie die Fleckgröße.",
+        "cta": "Simulation öffnen"
+      },
+      "color": {
+        "title": "Farbsehen‑Spiel",
+        "text": "Farbseh-Unterschiede machen manche Farbtöne schwer unterscheidbar. Finden Sie den abweichenden Kreis – und sehen Sie, warum “nur Farbe” als Hinweis nicht reicht.",
+        "cta": "Spiel öffnen"
+      }
+    }
+  }
+}

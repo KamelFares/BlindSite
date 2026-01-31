@@ -1,289 +1,512 @@
 <template>
   <section class="page">
-    <header class="page__header" v-scroll-reveal>
-      <h1 class="page__title">Welcome to BlindSite</h1>
-      <p class="page__lead reveal-on-hover">
-        This is an empathy/awareness experience. Move your mouse to reveal this text and explore the page as if you only have a small cone of vision.
-      </p>
+    <header class="hero" aria-label="Blindness education introduction">
+      <h1 class="hero__title reveal">{{ t('home.title') }}</h1>
+      <p class="hero__subtitle reveal">{{ t('home.subtitle1') }}</p>
+      <p class="hero__subtitle reveal">{{ t('home.subtitle2') }}</p>
     </header>
 
-    <section class="page__section" aria-labelledby="section-main" v-scroll-reveal>
-      <h2 id="section-main">Main Content</h2>
-      <p class="reveal-on-hover">
-        The web is mostly dark here. Only the area under your cursor is visible. Try to find all the text and interact with the page using your mouse or keyboard.
-      </p>
-    </section>
+    <main class="flow" aria-label="Educational sections">
+      <section
+        v-for="(s, index) in sections"
+        :key="s.id"
+        :style="styleFor(index)"
+        :id="s.id"
+        class="block"
+        :class="{ 'block--link': !!s.route }"
+        tabindex="0"
+        :role="s.route ? 'link' : 'region'"
+        :aria-label="s.route ? `${s.title}. Open simulation.` : s.title"
+        @click="s.route ? openRoute(s.route) : undefined"
+        @keydown.enter.prevent="s.route ? openRoute(s.route) : undefined"
+        @keydown.space.prevent="s.route ? openRoute(s.route) : undefined"
+      >
+        <!-- Cue: always visible hint that something is here -->
+        <div class="cue" aria-hidden="true">
+          <span class="cue__dot" />
+          <span class="cue__beam" />
+        </div>
 
-    <section class="page__section" aria-labelledby="section-what-1" v-scroll-reveal>
-      <h2 id="section-what-1">What is blindness?</h2>
-      <p class="reveal-on-hover">
-        Blindness does not always mean seeing nothing at all. Many blind and low-vision people see light, shapes, or limited detail. Vision can also change over time, or be different between the two eyes.
-      </p>
-    </section>
+        <div class="content">
+          <h2 class="content__title reveal">{{ s.title }}</h2>
+          <p class="content__text reveal">{{ s.text }}</p>
 
-    <section class="page__section" aria-labelledby="section-what-2" v-scroll-reveal>
-      <h2 id="section-what-2" class="visually-hidden">What is blindness? (continued)</h2>
-      <p class="reveal-on-hover">
-        Because blindness is so different from person to person, there is no single "blind experience". The examples on this site are just small slices meant to build empathy, not to speak for everyone.
-      </p>
-    </section>
+          <div v-if="s.route" class="content__cta">
+            <NuxtLink class="cta" :to="localePath(s.route)">{{ s.cta ?? 'Open' }}</NuxtLink>
+          </div>
+        </div>
+      </section>
+    </main>
 
-    <section class="page__section" aria-labelledby="section-navigation-1" v-scroll-reveal>
-      <h2 id="section-navigation-1">How do blind people navigate?</h2>
-      <p class="reveal-on-hover">
-        Many blind people use a white cane or guide dog together with memory, sound, touch and smell. The cane sends information through small vibrations and taps, helping to detect curbs, steps, obstacles and open space.
-      </p>
-    </section>
+    <!-- Donation links at the end of the page (awareness / support) -->
+    <footer class="donate" aria-label="Donation links">
+      <h2 class="donate__title reveal">{{ t('home.donateTitle') }}</h2>
+      <p class="donate__note reveal">{{ t('home.donateNote') }}</p>
 
-    <section class="page__section" aria-labelledby="section-navigation-2" v-scroll-reveal>
-      <h2 id="section-navigation-2" class="visually-hidden">How do blind people navigate? (continued)</h2>
-      <p class="reveal-on-hover">
-        Indoors, counting steps, feeling textures on the floor, listening for echoes and air movement can all help create a mental map of a room or hallway.
-      </p>
-    </section>
-
-    <section class="page__section" aria-labelledby="section-technology-1" v-scroll-reveal>
-      <h2 id="section-technology-1">Assistive technology on computers and phones</h2>
-      <p class="reveal-on-hover">
-        Screen readers like VoiceOver, JAWS, NVDA or TalkBack read out what is on the screen. People use keyboard shortcuts and gestures instead of a mouse to move between headings, links, buttons and form fields.
-      </p>
-    </section>
-
-    <section class="page__section" aria-labelledby="section-technology-2" v-scroll-reveal>
-      <h2 id="section-technology-2" class="visually-hidden">Assistive technology on computers and phones (continued)</h2>
-      <p class="reveal-on-hover">
-        Well-built websites use clear headings, descriptive link text, labels on form controls and good keyboard support. This makes it easier and faster for blind users to explore without getting lost.
-      </p>
-    </section>
-
-    <section class="page__section" aria-labelledby="section-respect-1" v-scroll-reveal>
-      <h2 id="section-respect-1">Respect and everyday life</h2>
-      <p class="reveal-on-hover">
-        Blind people study, work, raise families, play games and use social media like everyone else. Accessibility barriers often come from design choices, not from blindness itself.
-      </p>
-    </section>
-
-    <section class="page__section" aria-labelledby="section-respect-2" v-scroll-reveal>
-      <h2 id="section-respect-2" class="visually-hidden">Respect and everyday life (continued)</h2>
-      <p class="reveal-on-hover">
-        When you meet a blind person, it is usually best to introduce yourself, ask if they want help instead of grabbing them, and talk to them directly rather than only to the people around them.
-      </p>
-    </section>
-
-    <transition name="scroll-fade">
-      <div v-if="showScrollControls" class="scroll-controls">
-        <button class="scroll-arrow scroll-arrow--up" @click="scrollToTop" aria-label="Scroll to top">
-          <span class="eye-icon">&#128065;</span>
-        </button>
-        <button class="scroll-arrow scroll-arrow--down" @click="scrollToBottom" aria-label="Scroll to bottom">
-          <span class="eye-icon">&#128065;</span>
-        </button>
-      </div>
-    </transition>
+      <ul class="donate__list" aria-label="Donation links">
+        <li class="donate__item">
+          <a
+            class="donate__link"
+            :href="t('home.donations.dbsv.url')"
+            target="_blank"
+            rel="noopener noreferrer"
+            @click="dispatchAchievement('supporter', 'Supporter: you opened a donation link.')"
+          >
+            <span class="donate__name">{{ t('home.donations.dbsv.name') }}</span>
+            <span class="donate__desc">{{ t('home.donations.dbsv.desc') }}</span>
+          </a>
+        </li>
+        <li class="donate__item">
+          <a
+            class="donate__link"
+            :href="t('home.donations.proretina.url')"
+            target="_blank"
+            rel="noopener noreferrer"
+            @click="dispatchAchievement('supporter', 'Supporter: you opened a donation link.')"
+          >
+            <span class="donate__name">{{ t('home.donations.proretina.name') }}</span>
+            <span class="donate__desc">{{ t('home.donations.proretina.desc') }}</span>
+          </a>
+        </li>
+        <li class="donate__item">
+          <a
+            class="donate__link"
+            :href="t('home.donations.aktionMensch.url')"
+            target="_blank"
+            rel="noopener noreferrer"
+            @click="dispatchAchievement('supporter', 'Supporter: you opened a donation link.')"
+          >
+            <span class="donate__name">{{ t('home.donations.aktionMensch.name') }}</span>
+            <span class="donate__desc">{{ t('home.donations.aktionMensch.desc') }}</span>
+          </a>
+        </li>
+        <li class="donate__item">
+          <a
+            class="donate__link"
+            :href="t('home.donations.cbm.url')"
+            target="_blank"
+            rel="noopener noreferrer"
+            @click="dispatchAchievement('supporter', 'Supporter: you opened a donation link.')"
+          >
+            <span class="donate__name">{{ t('home.donations.cbm.name') }}</span>
+            <span class="donate__desc">{{ t('home.donations.cbm.desc') }}</span>
+          </a>
+        </li>
+      </ul>
+    </footer>
   </section>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import { useI18n, useLocalePath } from '#imports'
 
-const showScrollControls = ref(false)
+const { t, locale } = useI18n()
+const localePath = useLocalePath()
 
-const handleScroll = () => {
+const dispatchAchievement = (key: string, text: string) => {
   if (typeof window === 'undefined') return
-  // Hide by default and only show after scrolling AND moving the mouse
-  showScrollControls.value = window.scrollY > 150 && hasMouseMoved.value
+  window.dispatchEvent(new CustomEvent('blindsite:achievement', { detail: { key, text } }))
 }
 
-const hasMouseMoved = ref(false)
-const handleMouseMove = () => {
-  hasMouseMoved.value = true
-  handleScroll()
+type Section = {
+  id: string
+  title: string
+  text: string
+  route?: string
+  cta?: string
 }
 
-const scrollToTop = () => {
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+const router = useRouter()
+
+const openRoute = (to: string) => {
+  router.push(localePath(to))
 }
 
-const scrollToBottom = () => {
-  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+const sectionDefs = [
+  { id: 'what', key: 'what' },
+  { id: 'different', key: 'different' },
+  { id: 'navigate', key: 'navigate' },
+  { id: 'tech', key: 'tech' },
+  { id: 'design', key: 'design' },
+  { id: 'cataract', key: 'cataract', route: '/cataract' },
+  { id: 'macular', key: 'macular', route: '/macular' },
+  { id: 'color', key: 'color', route: '/colors' },
+  // New simulations (not yet in the i18n home sections list)
+  { id: 'retinopathy', key: 'retinopathy' },
+  { id: 'tunnel', key: 'tunnel' },
+  { id: 'migraine', key: 'migraine' },
+] as const
+
+const sections = computed<Section[]>(() =>
+  sectionDefs.map((d) => {
+    // Existing i18n-driven sections
+    if ('route' in d && d.route) {
+      return {
+        id: d.id,
+        title: t(`home.sections.${d.key}.title`),
+        text: t(`home.sections.${d.key}.text`),
+        route: d.route,
+        cta: t(`home.sections.${d.key}.cta`),
+      }
+    }
+
+    // New pages: use nav labels + short hardcoded descriptions for now
+    if (d.key === 'retinopathy') {
+      return {
+        id: d.id,
+        title: t('nav.retinopathy'),
+        text: 'Patchy blur + drifting floaters. Try to click the correct label.',
+        route: '/retinopathy',
+        cta: 'Open simulation',
+      }
+    }
+    if (d.key === 'tunnel') {
+      return {
+        id: d.id,
+        title: t('nav.tunnel'),
+        text: 'Restricted peripheral vision. Scan to find the target dot.',
+        route: '/tunnel',
+        cta: 'Open simulation',
+      }
+    }
+    if (d.key === 'migraine') {
+      return {
+        id: d.id,
+        title: t('nav.migraine'),
+        text: 'Shimmering aura + central scotoma overlay. Try to click the moving target.',
+        route: '/migraine',
+        cta: 'Open simulation',
+      }
+    }
+
+    // Fallback
+    return {
+      id: d.id,
+      title: d.id,
+      text: '',
+    }
+  })
+)
+
+// Randomize left/right position for each paragraph block while still scrolling normally.
+// (Deterministic per reload, but feels "scattered" across the page.)
+const offsets = ref<number[]>([])
+
+const generateOffsets = (count: number) => {
+  offsets.value = Array.from({ length: count }, () => {
+    const sign = Math.random() < 0.5 ? -1 : 1
+    const px = Math.round((120 + Math.random() * 220) * sign) // -340..-120 or 120..340
+    return px
+  })
 }
 
 onMounted(() => {
-  if (typeof window === 'undefined') return
-  handleScroll()
-  window.addEventListener('scroll', handleScroll)
-  window.addEventListener('mousemove', handleMouseMove, { once: true })
+  generateOffsets(sections.value.length)
 })
 
-onUnmounted(() => {
-  if (typeof window === 'undefined') return
-  window.removeEventListener('scroll', handleScroll)
-  window.removeEventListener('mousemove', handleMouseMove)
+// When switching languages, keep the same left/right layout, but if the number
+// of sections ever changes, regenerate.
+watch(
+  () => [locale.value, sections.value.length] as const,
+  ([, len]) => {
+    if (offsets.value.length !== len) generateOffsets(len)
+  }
+)
+
+const styleFor = (index: number) => ({
+  '--offset-x': `${offsets.value[index] ?? 0}px`,
 })
-
-// Simple scroll-reveal directive: sections slide up and fade in
-const vScrollReveal = {
-  mounted(el: HTMLElement) {
-    if (typeof window === 'undefined') return
-
-    el.classList.add('scroll-reveal')
-
-    const observer = new IntersectionObserver((entries, obs) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          el.classList.add('scroll-reveal--visible')
-          obs.unobserve(entry.target)
-        }
-      })
-    }, {
-      threshold: 0.2,
-    })
-
-    observer.observe(el)
-  },
-}
-
 </script>
 
 <style scoped>
 .page {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  min-height: auto;
+  /* user request: completely black */
+  min-height: 100vh;
 }
 
-.page__header {
+.donate {
+  margin: 4rem 0 7rem;
+  max-width: 72rem;
   display: grid;
-  gap: 1.25rem;
-  min-height: 100vh;
+  gap: 0.65rem;
+}
+
+.donate__title {
+  margin: 0.75rem 0 0;
+  font-size: clamp(1.15rem, 1.8vw, 1.45rem);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.donate__note {
+  margin: 0;
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+.donate__list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.donate__link {
+  display: grid;
+  gap: 0.2rem;
+  text-decoration: none;
+  padding: 0.75rem 0.9rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(2, 6, 23, 0.22);
+}
+
+.donate__name {
+  color: rgba(248, 250, 252, 0.12);
+  font-weight: 650;
+  transition: color 0.18s ease;
+}
+
+.donate__desc {
+  color: rgba(248, 250, 252, 0.06);
+  transition: color 0.18s ease;
+}
+
+.donate:hover .donate__name,
+.donate:focus-within .donate__name,
+.donate:hover .donate__desc,
+.donate:focus-within .donate__desc {
+  color: rgba(248, 250, 252, 0.92);
+}
+
+.donate__link:hover,
+.donate__link:focus-visible {
+  border-color: rgba(251, 191, 36, 0.75);
+  outline: none;
+}
+
+.hero {
+  min-height: 62vh;
+  display: grid;
+  gap: 0.9rem;
   align-content: center;
 }
 
-.page__title {
-  font-size: clamp(3rem, 5vw, 4.2rem);
-  line-height: 1.1;
-  letter-spacing: 0.02em;
+.hero__title {
+  font-size: clamp(3rem, 6vw, 4.6rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0;
 }
 
-.page__lead {
-  max-width: 44rem;
-  color: #e5e7eb;
-  font-size: 2.3rem;
-  line-height: 1.7;
+.hero__subtitle {
+  margin: 0;
+  max-width: 72rem;
+  font-size: clamp(1.25rem, 2.3vw, 2rem);
+  line-height: 1.65;
 }
 
-.page__section {
-  max-width: 44rem;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 1.25rem;
+/* On the hero we want the instructions to be readable without hover. */
+.hero .reveal {
+  color: rgba(248, 250, 252, 0.72);
+  text-shadow:
+    0 0 18px rgba(0, 0, 0, 0.75),
+    0 0 42px rgba(0, 0, 0, 0.7);
 }
 
-.reveal-on-hover {
-  color: rgba(229, 231, 235, 0.06);
-  font-size: 2.1rem;
-  line-height: 1.7;
-  letter-spacing: 0.01em;
-  transition: color 0.18s ease, background 0.25s ease, text-shadow 0.25s ease;
-  pointer-events: auto;
-  background: transparent;
-  border-radius: 0.75rem;
-  padding: 0.85rem 1rem;
+.flow {
+  display: grid;
+  /* more vertical space so users must "search" */
+  gap: 7rem;
+  padding: 3rem 0 14rem;
+
+  /* smoother, more “seamless” section-to-section experience */
+  scroll-snap-type: y proximity;
+}
+
+/* Make scrolling feel more "game-like" and readable */
+:global(html) {
+  scroll-behavior: smooth;
+  scrollbar-gutter: stable;
+}
+
+:global(body) {
+  scrollbar-color: rgba(248, 250, 252, 0.25) rgba(15, 23, 42, 0.45);
+}
+
+:global(::-webkit-scrollbar) {
+  width: 12px;
+}
+
+:global(::-webkit-scrollbar-track) {
+  background: rgba(15, 23, 42, 0.45);
+}
+
+:global(::-webkit-scrollbar-thumb) {
+  background: rgba(248, 250, 252, 0.22);
+  border-radius: 999px;
+  border: 2px solid rgba(15, 23, 42, 0.45);
+}
+
+:global(::-webkit-scrollbar-thumb:hover) {
+  background: rgba(248, 250, 252, 0.35);
+}
+
+.block {
   position: relative;
+  min-height: min(86vh, 740px);
+  display: grid;
+  align-content: center;
+  border-radius: 1.25rem;
+  padding: 1.25rem 1.25rem 1.25rem 3.5rem;
+  outline: none;
+
+  /* random left/right offset per section */
+  transform: translateX(var(--offset-x, 0px));
+  scroll-snap-align: center;
+  transition: transform 0.35s ease;
 }
-.reveal-on-hover:hover,
-.reveal-on-hover:focus {
-  color: rgba(248, 250, 252, 0.92);
-  background: radial-gradient(
-    circle at var(--cursor-x) var(--cursor-y),
-    rgba(248, 250, 252, 0.16) 0,
-    rgba(148, 163, 184, 0.06) 120px,
-    transparent 240px
+
+/* Cue that indicates where the paragraph is */
+.cue {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.cue__dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: rgba(248, 250, 252, 0.22);
+  box-shadow:
+    0 0 0 1px rgba(248, 250, 252, 0.18),
+    0 0 18px rgba(248, 250, 252, 0.12);
+  animation: cue-pulse 1.8s ease-in-out infinite;
+}
+
+.cue__beam {
+  width: 8px;
+  height: 68px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to bottom,
+    rgba(248, 250, 252, 0.0),
+    rgba(248, 250, 252, 0.12),
+    rgba(248, 250, 252, 0.0)
   );
+}
+
+@keyframes cue-pulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0.55;
+  }
+}
+
+.content {
+  max-width: 86rem;
+}
+
+.content__title {
+  margin: 0 0 1rem;
+  font-size: clamp(2rem, 3.5vw, 2.8rem);
+}
+
+.content__text {
+  margin: 0;
+  font-size: clamp(1.6rem, 2.7vw, 2.3rem);
+  line-height: 1.7;
+}
+
+/* Reveal mechanic: almost invisible until hovered/focused */
+.reveal {
+  color: rgba(248, 250, 252, 0.02);
+  transition: color 0.18s ease, text-shadow 0.18s ease;
+}
+
+.block:hover .reveal,
+.block:focus-within .reveal {
+  color: rgba(248, 250, 252, 0.92);
   text-shadow:
     0 0 18px rgba(15, 23, 42, 0.9),
     0 0 48px rgba(0, 0, 0, 0.75);
 }
 
-.reveal-on-hover:focus-visible {
+/* Extra reveal glow following the cursor */
+.block:hover {
+  background: radial-gradient(
+    circle at var(--cursor-x) var(--cursor-y),
+    rgba(248, 250, 252, 0.12) 0,
+    rgba(148, 163, 184, 0.04) 180px,
+    transparent 420px
+  );
+}
+
+.block--link {
+  cursor: pointer;
+}
+
+.block--link:focus-visible {
   outline: 2px solid rgba(251, 191, 36, 0.9);
   outline-offset: 4px;
 }
 
-.scroll-controls {
-  position: fixed;
-  /* Fixed on the right side */
-  right: 1.25rem;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  z-index: 10;
+.content__cta {
+  margin-top: 1.25rem;
 }
 
-.scroll-arrow {
-  background: #18181b;
-  border: 2px solid #e5e7eb;
-  border-radius: 50%;
-  width: 3rem;
-  height: 3rem;
-  display: flex;
+.cta {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 2px 12px #0008;
-  transition: background 0.2s, border 0.2s;
-  font-size: 2rem;
-  color: #e5e7eb;
-}
-.scroll-arrow:hover,
-.scroll-arrow:focus {
-  background: #27272a;
-  border-color: #f87171;
+  gap: 0.5rem;
+  text-decoration: none;
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  background: rgba(15, 23, 42, 0.55);
+  color: rgba(248, 250, 252, 0.92);
 }
 
-.eye-icon {
-  font-size: 2rem;
-  display: inline-block;
-  vertical-align: middle;
+.cta:hover,
+.cta:focus-visible {
+  background: rgba(15, 23, 42, 0.85);
 }
 
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+@media (max-width: 720px) {
+  .block {
+    padding-left: 3.15rem;
+    transform: translateX(0);
+    min-height: 62vh;
+  }
+  .cue {
+    left: 0.75rem;
+  }
+
+  .flow {
+    gap: 2.5rem;
+  }
 }
 
-/* Scroll reveal animation for sections */
-.scroll-reveal {
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
-
-.scroll-reveal--visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.scroll-fade-enter-active,
-.scroll-fade-leave-active {
-  transition: opacity 0.25s ease, transform 0.25s ease;
-}
-
-.scroll-fade-enter-from,
-.scroll-fade-leave-to {
-  opacity: 0;
-  transform: translateY(10px);
+@media (max-width: 420px) {
+  .block {
+    padding: 1rem 1rem 1rem 3.15rem;
+    min-height: 58vh;
+  }
 }
 </style>

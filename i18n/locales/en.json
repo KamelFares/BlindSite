@@ -1,0 +1,85 @@
+{
+  "nav": {
+    "light": "Light cone mode",
+    "cane": "Cane simulation",
+    "blindTouch": "Blind Touch game",
+    "colorVision": "Color vision game",
+    "cataract": "Cataract (blur + glare)",
+    "macular": "Macular (central blind spot)",
+    "visualSnow": "Visual Snow (neurological)",
+    "retinopathy": "Retinopathy (floaters + patches)",
+    "tunnel": "Tunnel vision",
+    "migraine": "Migraine aura",
+    "toggleLightOn": "Enable light effect",
+    "toggleLightOff": "Disable light effect",
+    "skip": "Skip to main content",
+    "language": "Language"
+  },
+  "home": {
+    "title": "BlindSite",
+    "subtitle1": "Scroll to explore. The screen is almost black — move your mouse to find hidden text.",
+    "subtitle2": "Left click creates an echo. Right click flashes. Hold right click to keep the flash on.",
+    "donateTitle": "Support blindness & disability organizations (Germany)",
+    "donateNote": "These links are provided for awareness and support. Please check the organization details before donating.",
+    "donateCta": "Open donation page",
+    "donations": {
+      "dbsv": {
+        "name": "DBSV – Deutscher Blinden- und Sehbehindertenverband",
+        "desc": "National association for blind and visually impaired people.",
+        "url": "https://www.dbsv.org/"
+      },
+      "proretina": {
+        "name": "PRO RETINA Deutschland e. V.",
+        "desc": "Support and information around retinal diseases.",
+        "url": "https://www.pro-retina.de/"
+      },
+      "aktionMensch": {
+        "name": "Aktion Mensch",
+        "desc": "Supports inclusion projects for people with disabilities.",
+        "url": "https://www.aktion-mensch.de/"
+      },
+      "cbm": {
+        "name": "CBM Deutschland",
+        "desc": "International development organization focused on disability and eye health.",
+        "url": "https://www.cbm.de/"
+      }
+    },
+    "sections": {
+      "what": {
+        "title": "What is blindness?",
+        "text": "Blindness does not always mean seeing nothing at all. Many blind and low-vision people can see light, shapes, or limited detail."
+      },
+      "different": {
+        "title": "Everyone’s vision loss is different",
+        "text": "There is no single “blind experience”. Some conditions affect the center, others the edges, contrast, or color perception. This site is an empathy demo, not a medical tool."
+      },
+      "navigate": {
+        "title": "How do blind people navigate?",
+        "text": "Many people use a white cane or guide dog together with memory, sound, touch, and spatial awareness. Indoors, texture changes, echoes, and landmarks help build a mental map."
+      },
+      "tech": {
+        "title": "Assistive technology",
+        "text": "Screen readers (VoiceOver, NVDA, JAWS, TalkBack) read out interfaces. Keyboard shortcuts and gestures help users move by headings, links, and controls instead of using a mouse."
+      },
+      "design": {
+        "title": "Good accessibility helps everyone",
+        "text": "Clear headings, descriptive link text, form labels, and keyboard support remove barriers. Accessibility problems usually come from design choices, not from blindness itself."
+      },
+      "cataract": {
+        "title": "Cataract (blur + glare) simulation",
+        "text": "Cataracts can make vision cloudy with strong glare around lights. Try the mini-game and increase severity to feel how reading becomes harder.",
+        "cta": "Open simulation"
+      },
+      "macular": {
+        "title": "Macular degeneration simulation",
+        "text": "Central vision may be blocked or blurred while peripheral vision remains. Try the peripheral-shape game and change the spot size.",
+        "cta": "Open simulation"
+      },
+      "color": {
+        "title": "Color vision game",
+        "text": "Color-vision differences can make some shades hard to distinguish. Try finding the different circle and see why “color only” design can fail.",
+        "cta": "Open game"
+      }
+    }
+  }
+}

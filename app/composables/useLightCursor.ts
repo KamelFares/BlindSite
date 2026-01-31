@@ -1,4 +1,5 @@
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { computed, onMounted } from 'vue'
+import { useState } from 'nuxt/app'
 
 type InputMode = 'pointer' | 'keyboard'
 
@@ -8,11 +9,17 @@ interface ViewportSize {
 }
 
 export function useLightCursor() {
-  const x = ref(0)
-  const y = ref(0)
-  const lightEnabled = ref(true)
-  const inputMode = ref<InputMode>('pointer')
-  const viewport = ref<ViewportSize>({ width: 1, height: 1 })
+  // NOTE: This composable is used by multiple components (app shell, audio
+  // layer, pages). We want all callers to share the same cursor state.
+  // `useState` makes it a per-request singleton in Nuxt.
+  const x = useState<number>('lightCursor:x', () => 0)
+  const y = useState<number>('lightCursor:y', () => 0)
+  const lightEnabled = useState<boolean>('lightCursor:enabled', () => true)
+  const inputMode = useState<InputMode>('lightCursor:inputMode', () => 'pointer')
+  const viewport = useState<ViewportSize>('lightCursor:viewport', () => ({ width: 1, height: 1 }))
+
+  // Ensure we only register resize listener once.
+  const initialized = useState<boolean>('lightCursor:initialized', () => false)
 
   const updateViewport = () => {
     if (typeof window === 'undefined') return
@@ -25,6 +32,9 @@ export function useLightCursor() {
   onMounted(() => {
     if (typeof window === 'undefined') return
 
+    if (initialized.value) return
+    initialized.value = true
+
     updateViewport()
 
     // start in the middle of the viewport
@@ -32,11 +42,6 @@ export function useLightCursor() {
     y.value = window.innerHeight / 2
 
     window.addEventListener('resize', updateViewport)
-  })
-
-  onUnmounted(() => {
-    if (typeof window === 'undefined') return
-    window.removeEventListener('resize', updateViewport)
   })
 
   const updateFromPointer = (event: MouseEvent | PointerEvent) => {

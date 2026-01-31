@@ -1,15 +1,15 @@
 <template>
   <section class="stick-page">
     <header class="stick-page__header">
-      <h1 class="stick-page__title">Cane Navigation Simulation</h1>
+      <h1 class="stick-page__title">Cane Simulation (Audio Hunt)</h1>
       <p class="stick-page__lead">
-        Imagine you are walking in a room with a white cane. You cannot see the
-        room – you can only move step by step and "tap" with your cane to
-        discover walls and obstacles.
+        Find hidden targets using sound only. Your cane sends a “ping” and you
+        must follow the audio cue (volume + stereo pan) to locate the target.
       </p>
       <p class="stick-page__instructions">
-        Use the <strong>arrow keys</strong> to move and press
-        <strong>Space</strong> to tap the cane in front of you.
+        Use <strong>arrow keys</strong> to move. Press <strong>Space</strong>
+        to ping. When you think you’re on the target tile, press
+        <strong>Enter</strong> to “pick up” the target.
       </p>
     </header>
 
@@ -18,42 +18,37 @@
         class="stick-page__arena"
         tabindex="0"
         role="application"
-        aria-label="Cane navigation simulation. Use arrow keys to move and space to tap."
+        aria-label="Audio hunt cane game. Arrow keys to move. Space to ping. Enter to pick up the target."
         @keydown.prevent="onKeydown"
       >
-        <div class="grid" aria-hidden="true">
-          <div
-            v-for="cell in cells"
-            :key="cell.id"
-            class="grid__cell"
-            :class="{
-              'grid__cell--player': cell.isPlayer,
-              'grid__cell--goal': cell.isGoal,
-              'grid__cell--obstacle': cell.isObstacle,
-            }"
-          >
-            <span v-if="cell.isPlayer" aria-hidden="true">🧍‍♂️</span>
-            <span v-else-if="cell.isGoal" aria-hidden="true">🚪</span>
-            <span v-else-if="cell.isObstacle" aria-hidden="true">⬛</span>
+        <div class="hud" aria-live="polite">
+          <div class="hud__row">
+            <span>Targets found: <strong>{{ found }}</strong> / {{ goalCount }}</span>
+            <span>Moves: <strong>{{ moves }}</strong></span>
+          </div>
+          <div class="hud__row">
+            <span>Last ping distance: <strong>{{ lastDistanceLabel }}</strong></span>
+            <span v-if="isOnTarget" class="hud__hot">Target is here</span>
           </div>
         </div>
 
-        <div class="stick-page__status" aria-live="polite">
-          <p class="stick-page__status-line">
-            {{ positionDescription }}
-          </p>
-          <p class="stick-page__status-line">
-            {{ caneFeedback }}
-          </p>
+        <p class="stick-page__status" aria-live="polite">{{ message }}</p>
+
+        <!-- Minimal visual: show only your position as a tiny dot (still mostly dark) -->
+        <div class="mini" aria-hidden="true">
+          <div
+            class="mini__dot"
+            :style="{ left: `${(playerX / (gridSize - 1)) * 100}%`, top: `${(playerY / (gridSize - 1)) * 100}%` }"
+          />
         </div>
       </section>
 
       <section class="stick-page__notes">
         <h2>What this tries to show</h2>
         <p>
-          Moving around without vision can feel slow and uncertain. Each step
-          needs checking. The cane translates shapes and distances into taps and
-          vibrations, instead of clear images.
+          In real life, people learn to map space through sound, touch and
+          repetition. This mini-game exaggerates that: you must build a mental
+          map and use audio cues to navigate.
         </p>
       </section>
     </main>
@@ -61,101 +56,172 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
-const gridSize = 5
+// Audio-only “target hunt”
+const gridSize = 11
+const goalCount = 3
 
-const playerX = ref(2)
-const playerY = ref(4)
+const playerX = ref(5)
+const playerY = ref(9)
 
-const goalX = 2
-const goalY = 0
+type Target = { x: number; y: number; found: boolean }
+const targets = ref<Target[]>([])
 
-// Simple set of obstacles in the room
-const obstacles = [
-  { x: 1, y: 2 },
-  { x: 2, y: 2 },
-  { x: 3, y: 2 },
-  { x: 0, y: 3 },
-  { x: 4, y: 3 },
-]
+const found = computed(() => targets.value.filter((t) => t.found).length)
+const moves = ref(0)
+const message = ref('Press Space to ping. Use the sound to find targets.')
+const lastDistance = ref<number | null>(null)
 
-const caneFeedback = ref('Press Space to tap the cane in front of you.')
+// --- Audio engine (beeps with stereo pan + volume based on distance) ---
+const audioCtx = ref<AudioContext | null>(null)
+const master = ref<GainNode | null>(null)
+const panner = ref<StereoPannerNode | null>(null)
+const beep = (distance: number, panValue: number) => {
+  try {
+    const ctx = audioCtx.value
+    const m = master.value
+    const p = panner.value
+    if (!ctx || !m || !p) return
 
-const cells = computed(() => {
-  const list: Array<{
-    id: string
-    x: number
-    y: number
-    isPlayer: boolean
-    isGoal: boolean
-    isObstacle: boolean
-  }> = []
+    const osc = ctx.createOscillator()
+    osc.type = 'sine'
+    // closer = higher pitch
+    osc.frequency.value = 250 + Math.max(0, 220 - distance * 12)
 
-  for (let y = 0; y < gridSize; y++) {
-    for (let x = 0; x < gridSize; x++) {
-      const id = `${x}-${y}`
-      const isPlayer = x === playerX.value && y === playerY.value
-      const isGoal = x === goalX && y === goalY
-      const isObstacle = obstacles.some((o) => o.x === x && o.y === y)
-      list.push({ id, x, y, isPlayer, isGoal, isObstacle })
+    const gain = ctx.createGain()
+    const volume = Math.max(0.02, Math.min(0.35, 0.35 - distance * 0.03))
+    gain.gain.value = 0
+
+    // Set pan instantly for the ping
+    p.pan.setValueAtTime(panValue, ctx.currentTime)
+
+    osc.connect(gain).connect(p)
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(volume, ctx.currentTime + 0.02)
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.26)
+
+    osc.start()
+    osc.stop(ctx.currentTime + 0.28)
+  } catch {
+    // ignore
+  }
+}
+
+const ensureAudio = async () => {
+  if (audioCtx.value) return
+  audioCtx.value = new AudioContext()
+  const ctx = audioCtx.value
+  const m = ctx.createGain()
+  m.gain.value = 0.35
+  const p = new StereoPannerNode(ctx, { pan: 0 })
+  p.connect(m).connect(ctx.destination)
+  master.value = m
+  panner.value = p
+}
+
+const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min
+
+const spawnTargets = () => {
+  const next: Target[] = []
+  while (next.length < goalCount) {
+    const x = randomInt(0, gridSize - 1)
+    const y = randomInt(0, gridSize - 1)
+    // avoid starting near player
+    const d = Math.abs(x - playerX.value) + Math.abs(y - playerY.value)
+    if (d < 4) continue
+    if (next.some((t) => t.x === x && t.y === y)) continue
+    next.push({ x, y, found: false })
+  }
+  targets.value = next
+}
+
+const nearestTarget = computed(() => {
+  const remaining = targets.value.filter((t) => !t.found)
+  if (remaining.length === 0) return null
+  let best = remaining[0]
+  let bestDist = Infinity
+  for (const t of remaining) {
+    const d = Math.abs(t.x - playerX.value) + Math.abs(t.y - playerY.value)
+    if (d < bestDist) {
+      bestDist = d
+      best = t
     }
   }
-
-  return list
+  return { target: best, dist: bestDist }
 })
 
-const positionDescription = computed(() => {
-  if (playerX.value === goalX && playerY.value === goalY) {
-    return 'You have found the door. Imagine the feeling of reaching a safe exit.'
-  }
-  return `You are somewhere in the room. You know the door is at the far side, but you cannot see it. Move slowly and tap with the cane.`
+const isOnTarget = computed(() => {
+  return targets.value.some((t) => !t.found && t.x === playerX.value && t.y === playerY.value)
 })
 
-const isBlocked = (x: number, y: number) => {
-  if (x < 0 || y < 0 || x >= gridSize || y >= gridSize) return true
-  return obstacles.some((o) => o.x === x && o.y === y)
-}
+const lastDistanceLabel = computed(() => {
+  if (lastDistance.value === null) return '—'
+  if (lastDistance.value === 0) return 'here'
+  if (lastDistance.value <= 2) return 'very close'
+  if (lastDistance.value <= 5) return 'close'
+  if (lastDistance.value <= 9) return 'far'
+  return 'very far'
+})
 
 const move = (dx: number, dy: number) => {
-  const nextX = playerX.value + dx
-  const nextY = playerY.value + dy
-
-  if (nextX < 0 || nextY < 0 || nextX >= gridSize || nextY >= gridSize) {
-    caneFeedback.value = 'Your cane hits a solid wall. You cannot go further this way.'
+  const nx = playerX.value + dx
+  const ny = playerY.value + dy
+  if (nx < 0 || ny < 0 || nx >= gridSize || ny >= gridSize) {
+    message.value = 'Wall. You cannot go further.'
     return
   }
-
-  if (isBlocked(nextX, nextY)) {
-    caneFeedback.value = 'The cane touches an obstacle in front of you. You feel a hard object blocking the way.'
-    return
-  }
-
-  playerX.value = nextX
-  playerY.value = nextY
-  caneFeedback.value = 'The floor feels clear. You carefully take a step forward.'
+  playerX.value = nx
+  playerY.value = ny
+  moves.value++
+  message.value = 'Step.'
 }
 
-const tapCane = () => {
-  const aheadX = playerX.value
-  const aheadY = playerY.value - 1
-
-  if (aheadY < 0) {
-    caneFeedback.value = 'When you tap ahead, the cane meets a wall. You have reached the top of the room.'
+const ping = async () => {
+  await ensureAudio()
+  const best = nearestTarget.value
+  if (!best) {
+    message.value = 'No targets left.'
     return
   }
 
-  if (obstacles.some((o) => o.x === aheadX && o.y === aheadY)) {
-    caneFeedback.value = 'The cane quickly taps something in front of you. There is an obstacle ahead.'
+  lastDistance.value = best.dist
+  // pan based on relative x (-1..1)
+  const dx = best.target.x - playerX.value
+  const panValue = Math.max(-1, Math.min(1, dx / 4))
+  message.value = 'Ping… follow the sound.'
+  beep(best.dist, panValue)
+}
+
+const pickup = () => {
+  const t = targets.value.find((tt) => !tt.found && tt.x === playerX.value && tt.y === playerY.value)
+  if (!t) {
+    message.value = 'Nothing here.'
     return
   }
 
-  if (aheadX === goalX && aheadY === goalY) {
-    caneFeedback.value = 'The cane finds the outline of a doorway. You have discovered the exit.'
-    return
+  t.found = true
+  message.value = 'Found it.'
+  lastDistance.value = 0
+  // Achievement
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(
+      new CustomEvent('blindsite:achievement', {
+        detail: { key: 'finder', text: 'Seeker: you found a target by sound.' },
+      })
+    )
   }
 
-  caneFeedback.value = 'The cane finds only empty floor ahead. It feels safe to move forward.'
+  if (found.value >= goalCount) {
+    message.value = `All targets found in ${moves.value} moves. Great job.`
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('blindsite:achievement', {
+          detail: { key: 'caneMaster', text: 'Cane master: you completed the audio hunt.' },
+        })
+      )
+    }
+  }
 }
 
 const onKeydown = (event: KeyboardEvent) => {
@@ -174,10 +240,25 @@ const onKeydown = (event: KeyboardEvent) => {
       break
     case ' ':
     case 'Spacebar':
-      tapCane()
+      ping()
+      break
+    case 'Enter':
+      pickup()
       break
   }
 }
+
+onMounted(() => {
+  spawnTargets()
+  // Achievement: entered the cane page
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(
+      new CustomEvent('blindsite:achievement', {
+        detail: { key: 'cane', text: 'Navigator: you started the cane audio hunt.' },
+      })
+    )
+  }
+})
 </script>
 
 <style scoped>
@@ -219,42 +300,47 @@ const onKeydown = (event: KeyboardEvent) => {
   box-shadow: 0 0 0 2px #f97316;
 }
 
-.grid {
+.hud {
   display: grid;
-  grid-template-columns: repeat(5, 2.3rem);
-  grid-template-rows: repeat(5, 2.3rem);
-  gap: 0.3rem;
-  margin-bottom: 1rem;
+  gap: 0.4rem;
+  margin-bottom: 0.9rem;
+  color: rgba(229, 231, 235, 0.95);
+  font-size: 0.95rem;
 }
 
-.grid__cell {
-  border-radius: 0.35rem;
-  background: rgba(15, 23, 42, 0.9);
+.hud__row {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.3rem;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
-.grid__cell--player {
-  background: #fbbf24;
-}
-
-.grid__cell--goal {
-  background: #22c55e;
-}
-
-.grid__cell--obstacle {
-  background: #4b5563;
+.hud__hot {
+  color: #fbbf24;
+  font-weight: 700;
 }
 
 .stick-page__status {
-  font-size: 0.95rem;
-  color: #e5e7eb;
+  color: rgba(229, 231, 235, 0.92);
+  margin: 0 0 1.1rem;
 }
 
-.stick-page__status-line + .stick-page__status-line {
-  margin-top: 0.5rem;
+.mini {
+  position: relative;
+  height: 260px;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.mini__dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+  background: rgba(251, 191, 36, 0.9);
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.35);
 }
 
 .stick-page__notes {

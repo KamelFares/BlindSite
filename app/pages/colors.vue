@@ -172,9 +172,9 @@ makeRound()
 
 .colors-grid {
   display: grid;
-  grid-template-columns: repeat(4, 3.2rem);
-  grid-template-rows: repeat(4, 3.2rem);
-  gap: 0.75rem;
+  grid-template-columns: repeat(4, 4.25rem);
+  grid-template-rows: repeat(4, 4.25rem);
+  gap: 1rem;
   margin-bottom: 1.25rem;
 }
 
